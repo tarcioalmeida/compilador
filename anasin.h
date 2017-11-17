@@ -36,5 +36,5 @@ void tipos_param();
 void tipos_p_opc();
 void atrib();
 void cmd();
-void progteste();
+void prog();
 #endif
