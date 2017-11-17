@@ -1,0 +1,1 @@
+){inteiro a; real b; booleano y,d,f,z,g;}

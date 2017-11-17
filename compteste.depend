@@ -1,0 +1,26 @@
+# depslib dependency file v1.0
+1510619348 source:a:\desktop\compilador\nteinteressa\teste\analex.c
+	"analex.h"
+
+1510625279 a:\desktop\compilador\nteinteressa\teste\analex.h
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<string.h>
+	<math.h>
+
+1510625223 source:a:\desktop\compilador\nteinteressa\teste\anasin.c
+	"anasin.h"
+
+1510625339 a:\desktop\compilador\nteinteressa\teste\anasin.h
+	"analex.h"
+	"controlador_tab.h"
+
+1510625424 a:\desktop\compilador\nteinteressa\teste\controlador_tab.h
+
+1510621091 source:a:\desktop\compilador\nteinteressa\teste\main.c
+	"anasin.h"
+
+1510625298 source:a:\desktop\compilador\nteinteressa\teste\controlador_tab.c
+	"controlador_tab.h"
+
