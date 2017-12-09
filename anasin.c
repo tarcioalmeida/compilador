@@ -8,6 +8,14 @@ void erroSintatico(char erro[]){
     exit(1);
 }
 
+void erroSemantico(char erro[]){
+
+    printf("\nERRO SEMANTICO na Linha %d: %s", linhas, erro);
+
+    system("pause");
+    exit(1);
+}
+
 /*OK*/
 int opr_rel()
 {
@@ -64,6 +72,12 @@ int fator(){
 
     /*Se for ID*/
     else if(tk.categoria == ID){
+
+        //AnaSem - Procurar se id existe
+        // - Se ID não existir na tabela de simbolos
+        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
+            erroSemantico("ID nao declarado");
+        }
 
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
@@ -416,7 +430,12 @@ void atrib(){
 
     //Se  for ID
     if(tk.categoria == ID){
-        //Não sei se precisa consultar a tabela
+        //AnaSem - Procurar se id existe
+        // - Se ID não existir na tabela de simbolos
+        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
+            erroSemantico("ID nao declarado");
+        }
+
         analex();
 
         //Se for um sinal de atribuição
@@ -644,6 +663,12 @@ void cmd(){
 
         //SE FOR ID
         else if(tk.categoria == ID){
+
+            //AnaSem - Procurar se id existe
+            // - Se ID não existir na tabela de simbolos
+            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
+                erroSemantico("ID nao declarado");
+            }
 
             //olha o proximo token, se for atribuição
             //temos uma atribuição
