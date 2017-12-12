@@ -319,6 +319,8 @@ token analisadorLexico(){
                 tkfunc.categoria = SN;
                 tkfunc.cod = AND;
                 return tkfunc;
+            }else{
+                erroAnalisadorLexico("Erro!");
             }
             break; /*BREAK ESTADO 23 */
 

@@ -17,8 +17,7 @@ void erroSemantico(char erro[]){
 }
 
 /*OK*/
-int opr_rel()
-{
+int opr_rel(){
     if(tk.categoria == SN)
     {
         if(tk.cod == COMPARA || tk.cod == DIFERENTE || tk.cod == MAIOR_IG || tk.cod == MAIOR_Q || tk.cod == MENOR_IG || tk.cod == MENOR_Q)
@@ -40,60 +39,59 @@ void termo(){
     fator();
 
     //Se o proximo token for um sinal
-    if(tknext.categoria == SN){
+    if(tknext.categoria == SN && (tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
 
-        //E Se esse proximo token for * / ou &&
-        if(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND){
-            analex();
+
+            analex();//vai pro sinal
+
             while(1){
                 analex();
                 fator();
                 if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
                     break;
                 }
-                analex();
+                analex(); //vai pro sinal
 
             }//fim-while
 
-        }//fim-E Se esse proximo token for * / ou &&
-        else{
-            //erroSintatico("É esperado um operador *, / ou AND");
-        }
 
     }//fimSe o proximo token for um sinal
+
+    return;
 }
 
 /*OK*/
 int fator(){
     /*Se for Inteiro, Real ou Caractere*/
     if(tk.categoria == CT_I || tk.categoria == CT_R || tk.categoria == CT_C  || tk.categoria == CT_LT){
+        printf("\nSomente CTI, CTR, CTC OU CTLT");
         return 1;
     }
 
     /*Se for ID*/
     else if(tk.categoria == ID){
 
-        //AnaSem - Procurar se id existe
-        // - Se ID não existir na tabela de simbolos
-        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
-            erroSemantico("ID nao declarado");
-        }
+         printf("\nLeu id");
 
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
+            printf("\nSomente id");
             return 1;
         }
 
-        //Ve o proximo token
-        analex();
+        printf("\nnao eh somente id");
 
         //Se for abrir parentesis
-        if(tk.categoria == SN && tk.cod ==  PARENTESIS_ABRE){
+        if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_ABRE){
 
+            //vai pro parentesis
+            analex();
+
+            printf("\n ta no abre parentesis");
             //Se o próximo token for fecha parentesis
             if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_FECHA){
-
                 //Ve o proximo token e sai
+                printf("\n nada dentro do parentesis");
                 analex();
                 return 1;
             }
@@ -102,38 +100,37 @@ int fator(){
             analex();
             expr();
 
-            //Se o proximo token for um sinal
-            if(tknext.categoria == SN){
-                //E Se esse proximo token for VIRG
-                if(tknext.cod == VIRG){
+            //Se o proximo token for um sinal E Se esse proximo token for VIRG
+            if(tknext.categoria == SN && tknext.cod == VIRG){
+                analex(); //vai pra virgula
+
+                //vai chamando expr
+                while(1){
+                    //vai pra expr
                     analex();
-                    while(1){
-                        analex();
-                        expr();
-                        if(!(tknext.cod == VIRG)){
-                            break;
-                        }
-                        analex();
+                    expr();
 
-                    }//fim-while
+                    if(!(tknext.categoria == SN && tknext.cod == VIRG)){
+                        break;
+                    }
+                    analex(); //vai pra virgula
 
-                }//fim-E Se esse proximo token for VIRG
-            }//fimSe o proximo token for um sinal
+                }//fim-while
+            }//fimSe o proximo token for um sinal E Se esse proximo token for VIRG
 
-            analex();
             //If para checar se houve fechar parentesis
-            if(!(tk.categoria == SN && tk.cod == PARENTESIS_FECHA)){
+            if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_FECHA)){
                 //Erro faltando parentesis
                 erroSintatico("Falta fecha parentesis");
             }
-
-            return 1;
+            //Se for fecha parentesis
+            else{
+                //Vai pro fecha parentesis
+                analex();
+                return 1;
+            }
 
         }//FIM-Se for abrir parentesis
-        else{
-            //ERRO FALTANDO FECHAR PARENTESIS
-            erroSintatico("Falta fecha parentesis");
-        }//FIM-ELSE
 
     }//Fim-Se for ID
 
@@ -143,19 +140,23 @@ int fator(){
         analex();
         expr();
 
-        analex();
         //If para checar se houve fechar parentesis
-        if(!(tk.categoria == SN && tk.cod == PARENTESIS_FECHA)){
+        if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_FECHA)){
             //Erro faltando parentesis
             erroSintatico("Falta fecha parentesis");
         }
+        //Se for fecha parentesis
+        else{
+            //Vai pro fecha parentesis
+            analex();
+            return 1;
+        }
 
-        return 1;
     }
-
 
     /* Se for negação de expressão */
     else if(tk.categoria == SN && tk.cod == NEGACAO){
+        printf("\eh negacao");
         analex();
         fator();
     }
@@ -170,16 +171,18 @@ int fator(){
 /*OK*/
 void expr(){
 
+    printf("\ncheguei em expr");
+
     expr_simp();
 
     if(tknext.categoria == SN){
         //se o proximo token for op relacional
         if(tknext.cod == COMPARA || tknext.cod == DIFERENTE || tknext.cod == MAIOR_Q || tknext.cod == MENOR_Q || tknext.cod == MAIOR_IG || tknext.cod == MENOR_IG){
-            analex();
-            opr_rel();
+            analex(); //vai pro op_rel
+            opr_rel(); //confirma op_rel
+
             analex();
             expr_simp();
-
         }//fim-se o proximo token for op relacional
         else{
             //Erro, esperando operador relacional
@@ -189,75 +192,29 @@ void expr(){
 }
 
 /*OK*/
-void expr_simp()
-{
-    /*Se o termo começar com + ou - */
-    if(tk.categoria == SN)
-    {
-        if(tk.cod == SOMA || tk.cod == SUB)
-        {
+void expr_simp(){
 
+    /*Se o termo começar com + ou - */
+    if(tk.categoria == SN && (tk.cod == SOMA || tk.cod == SUB)){
+        analex();
+    }
+
+    termo();
+
+    if(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR)){
+        analex(); //vai pro sinal
+        while(1){
             analex();
             termo();
-
-            //Se o proximo token for um sinal
-            if(tknext.categoria == SN){
-                //E Se esse proximo token for + - ou &||
-                if(tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR){
-                    analex();
-                    while(1){
-                        analex();
-                        termo();
-                        if(!(tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR)){
-                            break;
-                        }
-                        analex();
-
-                    }//fim-while
-
-                }//fim-E Se esse proximo token for + - ou &||
-                else{
-                    //erroSintatico("É esperando um operador +, - ou OR");
-                }
-            }//fim-Se o proximo token for um sinal
-
-        }else{//else da categoria
-
-
-            /*ERRO NO TIPO DE OPERADOR USADO*/
-            erroSintatico("É esperado + ou -");
-
-
-        }//else
-
-    }else{
-
-        termo();
-
-        //Se o proximo token for um sinal
-        if(tknext.categoria == SN){
-            //E Se esse proximo token for + - ou &||
-            if(tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR){
-                analex();
-                while(1){
-                    analex();
-                    termo();
-                    if(!(tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR)){
-                        break;
-                    }
-                    analex();
-
-                }//fim-while
-
-            }//fim-E Se esse proximo token for + - ou &||
-            else{
-                //erroSintatico("É esperando um operador +, - ou OR");
+            if(!(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR))){
+                break;
             }
-        }//fim-Se o proximo token for um sinal
+            analex();
+        }//fim-while
 
-    }// else do SN
+    }
 
-}//VOID
+}
 
 /*OK*/
 int tipo(){
@@ -430,12 +387,6 @@ void atrib(){
 
     //Se  for ID
     if(tk.categoria == ID){
-        //AnaSem - Procurar se id existe
-        // - Se ID não existir na tabela de simbolos
-        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
-            erroSemantico("ID nao declarado");
-        }
-
         analex();
 
         //Se for um sinal de atribuição
@@ -664,12 +615,6 @@ void cmd(){
         //SE FOR ID
         else if(tk.categoria == ID){
 
-            //AnaSem - Procurar se id existe
-            // - Se ID não existir na tabela de simbolos
-            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL,0,0)){
-                erroSemantico("ID nao declarado");
-            }
-
             //olha o proximo token, se for atribuição
             //temos uma atribuição
             if(tknext.categoria == SN && tknext.cod == ATRIB){
@@ -761,8 +706,7 @@ void cmd(){
 }//void
 /*Obs: se der erro em cmd, provavelmente seja por conta dos dois ultimos elses ;*/
 
-void prog()
-{
+void prog(){
     int guardarTipo;
     //analex();
     if(tk.categoria == PR && tipo() < 0)// if 1
@@ -1219,11 +1163,10 @@ void prog()
     }else// else do else if 1
     {
         printf("VAZIO \n");
-        return;
+        //return;
     }// fecha else do else if 1
 
 }// fecha prog
-
 
 
 void anasin(){
@@ -1232,7 +1175,12 @@ void anasin(){
     analex();
     analex();
 
-    prog();
+    //enquanto não for fim de arquivo
+    while(!feof(arquivo)){
+        prog();
+        analex();
+        printf("\nLinha: %d",linhas);
+    }//fim-enquanto não for fim de arquivo
 }
 
 int main(){
