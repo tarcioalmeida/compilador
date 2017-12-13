@@ -34,9 +34,11 @@ int opr_rel(){
 }
 
 /*OK*/
-void termo(){
+int termo(){
+    int tipo1, tipo2;
 
-    fator();
+    tipo1 = fator();
+    printf("\n****CODIGO T1 EM TERMO: %d\n",tipo1);
 
     //Se o proximo token for um sinal
     if(tknext.categoria == SN && (tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
@@ -46,40 +48,69 @@ void termo(){
 
             while(1){
                 analex();
-                fator();
-                if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                tipo2 = fator();
+                printf("\n****CODIGO T2 EM TERMO: %d\n",tipo2);
+                if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+                    if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+                    if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else if(tipo1 == tipo2)
+                {
+                        if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else{
+                    erroSemantico("Tipos de variavéis diferentes termo");
+                }
+                /*if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
                     break;
                 }
-                analex(); //vai pro sinal
+                analex(); //vai pro sinal*/
 
             }//fim-while
 
 
     }//fimSe o proximo token for um sinal
 
-    return;
+    return tipo1;
 }
 
 /*OK*/
 int fator(){
+    int tipo;
+
     /*Se for Inteiro, Real ou Caractere*/
     if(tk.categoria == CT_I || tk.categoria == CT_R || tk.categoria == CT_C  || tk.categoria == CT_LT){
-        printf("\nSomente CTI, CTR, CTC OU CTLT");
-        return 1;
+
+        if(tk.categoria == CT_I) return INTEIRO;
+        if(tk.categoria == CT_C) return CARACTER;
+        if(tk.categoria == CT_R) return REAL;
     }
 
     /*Se for ID*/
     else if(tk.categoria == ID){
 
-         printf("\nLeu id");
 
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
-            printf("\nSomente id");
-            return 1;
+            printf("\n%c\n", tk.lexema);
+            tipo = PesquisarTipo(tk);
+
+            return tipo;
         }
 
-        printf("\nnao eh somente id");
 
         //Se for abrir parentesis
         if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_ABRE){
@@ -87,11 +118,11 @@ int fator(){
             //vai pro parentesis
             analex();
 
-            printf("\n ta no abre parentesis");
+            //printf("\n ta no abre parentesis");
             //Se o próximo token for fecha parentesis
             if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_FECHA){
                 //Ve o proximo token e sai
-                printf("\n nada dentro do parentesis");
+                //printf("\n nada dentro do parentesis");
                 analex();
                 return 1;
             }
@@ -169,11 +200,12 @@ int fator(){
 }
 
 /*OK*/
-void expr(){
+int expr(){
 
-    printf("\ncheguei em expr");
+    int tipo1, tipo2;
 
-    expr_simp();
+    tipo1 = expr_simp();
+    printf("\nCODIGO T1 EM EXPR: %d\n",tipo1);
 
     if(tknext.categoria == SN){
         //se o proximo token for op relacional
@@ -182,30 +214,59 @@ void expr(){
             opr_rel(); //confirma op_rel
 
             analex();
-            expr_simp();
+            tipo2 = expr_simp();
+            printf("\nCODIGO T2 EM EXPR: %d\n",tipo2);
+            if(tipo1 != tipo2)
+            {
+                erroSemantico("Tipos de variaveis diferentes!");
+            }
         }//fim-se o proximo token for op relacional
         else{
             //Erro, esperando operador relacional
             //erroSintatico("Falta operador relacional");
         }
     }
+
+    return tipo1;
+
 }
 
 /*OK*/
-void expr_simp(){
+int expr_simp(){
+
+    int tipo1, tipo2;
 
     /*Se o termo começar com + ou - */
     if(tk.categoria == SN && (tk.cod == SOMA || tk.cod == SUB)){
         analex();
     }
 
-    termo();
+    tipo1 = termo();
+    printf("\n****CODIGO T1 EM Exp_SIMPLES: %d\n",tipo1);
 
     if(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR)){
         analex(); //vai pro sinal
         while(1){
+
             analex();
-            termo();
+            tipo2 = termo();
+            printf("\n****CODIGO T2 EM EXPR_SIMPLES: %d\n",tipo2);
+            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+
+
+                }else if(tipo1 == tipo2)
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variavéis diferentes expr_simples");
+                }
+
             if(!(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR))){
                 break;
             }
@@ -214,7 +275,9 @@ void expr_simp(){
 
     }
 
+        return tipo1;
 }
+
 
 /*OK*/
 int tipo(){
@@ -384,16 +447,34 @@ void tipos_p_opc(){
 
 /*OK*/
 void atrib(){
-
+    int tipo1, tipo2;
     //Se  for ID
     if(tk.categoria == ID){
         analex();
 
+        tipo1 = PesquisarTipo(tk);
+        printf("\nCODIGO DO ID EM ATRIB: %d\n",tipo1);
         //Se for um sinal de atribuição
         if(tk.categoria == SN && tk.cod == ATRIB){
 
             analex();
-            expr();
+            tipo2 = expr();
+            printf("\n***CODIGO DO ATRIB: %d\n",tipo2);
+            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+
+
+                }else if(tipo1 == tipo2)
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variavéis diferentes!\n");
+                }
 
         }//fim-Se for um sinal de atribuição
         else{
@@ -406,6 +487,7 @@ void atrib(){
     }
 
 }
+
 
 /*OK*/
 void cmd(){
