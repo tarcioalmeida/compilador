@@ -7,7 +7,7 @@ void iniciarTabelaDeSimbolos(){
     topo = -1;
 }
 
-/*FunÁ„o principal*/
+/*Fun√ß√£o principal*/
 int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int categoria, int zumbi){
 
     switch (operation){
@@ -120,4 +120,27 @@ void imprimirTabela(){
         printf("\nZumbi: %d",tabela[i].zumbi);
         printf("\n----------- FIM-LINHA %d -----------", tabela[i].i);
     }
+}
+
+int PesquisarTipo(token tk)
+{
+    int i = topo;
+
+    if(topo == -1){
+        return FALSO;
+    }
+
+    for(i = topo; i!=-1; i--){
+
+		if(strcmp(tabela[i].lexema, tk.lexema)==0){
+			if(tabela[i].escopo == -6){
+				return tabela[i].tipo;
+			}else{
+			    erroSemantico("Variavel n√£o declarada!");
+			}
+		}
+
+    }
+
+    erroSemantico("Variavel nao declarada!");
 }
