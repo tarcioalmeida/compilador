@@ -7,31 +7,34 @@
 
 /*Estrutura da Tabela*/
 typedef struct linhaTabSimb{
-    int i; //Número da linha da tabela
+    int i; //NÃºmero da linha da tabela
     char lexema[TAM_LEXEMA]; //nome
     int tipo; //INT, FLOAT, CHAR, ETC...
     int escopo; //Global ou Local
-    int categoria; //Função, Parametro, Variavel
+    int categoria; //FunÃ§Ã£o, Parametro, Variavel
     int zumbi; //Flag
+    int prototipo;//flag
 }Linha_TabSimb;
 
-/*Enum para deixar o código claro */
+/*Enum para deixar o cÃ³digo claro */
 enum{EMPILHAR = -2, DESEMPILHAR = -3, CONSULTAR = -4, CONSULTARPARAM = -50}operations;
 enum{LOCAL = -6, GLOBAL = -7}escopo;
 enum{SIM_ZUMBI = 1, NAO_ZUMBI = 0}zumbi;
 enum{FUNC = -10, PARAM = -11, VAR = -12}categoria;
+enum{PROTO = 1, N_PROTO =0}prototipo;
 
-/*Declarações Globais*/
+/*DeclaraÃ§Ãµes Globais*/
 Linha_TabSimb tabela[TAM_TABSIMB];
 int topo;
 
-/*Assinatura das Funções*/
+/*Assinatura das FunÃ§Ãµes*/
 void iniciarTabelaDeSimbolos();
-int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int categoria, int zumbi);
-void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi);
+int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int categoria, int zumbi, int prototipo);
+void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi, int prototipo);
 void desempilhar();
-int consultar(char lexema[], int escopo);
+int consultar(char lexema[], int escopo, int prototipo);
 int consultarParam(char lexema[], int escopo);
 void imprimirTabela();
+int PesquisarTipo(token tk);
 
 #endif
