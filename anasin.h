@@ -26,10 +26,10 @@ enum{
 
 /*Assinatura de Funções*/
 void erroSintatico(char erro[]);
-void termo();
+int termo();
 int fator();
-void expr();
-void expr_simp();
+int expr();
+int expr_simp();
 int opr_rel();
 int tipo();
 void tipos_param();
