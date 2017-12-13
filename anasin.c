@@ -321,8 +321,8 @@ void tipos_param(){
             if(tk.categoria == ID){
 
                 //Se nÃ£o houver o ID na tabela, ele insere
-                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
-                    controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
+                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                    controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI, N_PROTO);
 
                     //E Se esse proximo token for VIRG
                     if(tknext.categoria == SN && tknext.cod == VIRG){
@@ -335,8 +335,8 @@ void tipos_param(){
                                 analex();
                                 //Se for ID
                                 if(tk.categoria == ID){
-                                    if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
-                                        controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
+                                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                                        controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI, N_PROTO);
                                     }else{
                                         erroSintatico("ID já existente");
                                     }
@@ -401,8 +401,8 @@ void tipos_p_opc(){
             //Se o próximo token for ID
             if(tknext.categoria == ID){
                 analex();//to no id
-                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
-                    controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
+                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                    controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI, N_PROTO);
                 }
                 else{
                     erroSintatico("ID já existente");
@@ -419,8 +419,8 @@ void tipos_p_opc(){
                     //Se o próximo token for ID
                     if(tknext.categoria == ID){
                         analex();//to no id
-                        if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
-                            controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
+                	if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                    		controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI, N_PROTO);
                         }
                         else{
                             erroSintatico("ID já existente");
@@ -805,9 +805,9 @@ void prog(){
                     {
                         printf("ID \n");
                         analex();
-                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 10
+                       if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 10
                         {
-                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, PROTO);
 
                             if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 4
                             {
@@ -828,9 +828,9 @@ void prog(){
                                                 {
                                                     printf("ID");
                                                             analex();
-                                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0))// if 11
+                                                             if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, PROTO))// if 11
                                                             {
-                                                                controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, LOCAL, PARAM, SIM_ZUMBI);
+                                                                controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, LOCAL, PARAM, SIM_ZUMBI, PROTO);
                                                                  /*if(tknext.categoria == ID)// if 6
                                                                 {
 
@@ -897,9 +897,9 @@ void prog(){
                     {
                         analex();
                          printf("ID\n");
-                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 10
+                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 10
                         {
-                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, PROTO);
 
                             if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 4
                             {
@@ -920,9 +920,9 @@ void prog(){
                                         {
                                             printf("ID\n");
                                             analex();
-                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 11
+                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 11
                                                 {
-                                                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                                                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, PROTO);
                                                     /* if(tknext.categoria == ID)// if 6
                                                     {
 
@@ -987,9 +987,9 @@ void prog(){
                 {
                     printf("ID \n");
                     analex();
-                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 21
+                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 21
                       {
-                           controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                           controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, N_PROTO);
                            if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 23
                             {
                                 printf("ABRE PARENTESI \n");
@@ -1024,8 +1024,8 @@ void prog(){
                                                         analex();//tá no id
 
                                                         //Insere ID na tabela
-                                                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
-                                                            controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
+                                                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                                                            controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI, N_PROTO);
                                                         }else{
                                                             erroSintatico("ID já existente");
                                                         }
@@ -1042,8 +1042,8 @@ void prog(){
                                                             analex();//pra pegar o ID
 
                                                             //Insere ID na tabela
-                                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
-                                                                controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
+                                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                                                                controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI, N_PROTO);
                                                             }else{
                                                                 erroSintatico("ID já existente");
                                                             }
@@ -1108,9 +1108,9 @@ void prog(){
             {
                  printf("ID \n");
                  analex();
-                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 71
+                if(controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 71
                  {
-                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, N_PROTO);
                     if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 73
                     {
                         analex();
@@ -1140,8 +1140,8 @@ void prog(){
                                         analex();//tá no id
 
                                         //Insere ID na tabela
-                                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
-                                            controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
+                                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                                            controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI,N_PROTO);
                                         }else{
                                             erroSintatico("ID já existente");
                                         }
@@ -1158,8 +1158,8 @@ void prog(){
                                             analex();//pra pegar o ID
 
                                             //Insere ID na tabela
-                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
-                                                controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
+                                            if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, N_PROTO)){
+                                                controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI, N_PROTO);
                                             }else{
                                                 erroSintatico("ID já existente");
                                             }
@@ -1210,9 +1210,9 @@ void prog(){
                             {
                                 printf("ID \n");
                                 analex();
-                                 if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0))// if 71
+                                 if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 71
                                  {
-                                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
+                                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, N_PROTO);
                                 }else// if 71
                                 {
                                     erroSintatico("Dupla decraração");
