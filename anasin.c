@@ -2,7 +2,7 @@
 
 void erroSintatico(char erro[]){
 
-    printf("\nERRO SINT¡TICO na Linha %d: %s", linhas, erro);
+    printf("\nERRO SINT√ÅTICO na Linha %d: %s", linhas, erro);
 
     system("pause");
     exit(1);
@@ -33,10 +33,14 @@ int opr_rel(){
     return 0;
 }
 
-/*OK*/
-void termo(){
 
-    fator();
+
+/*OK*/
+int termo(){
+    int tipo1, tipo2;
+
+    tipo1 = fator();
+    printf("\n****CODIGO T1 EM TERMO: %d\n",tipo1);
 
     //Se o proximo token for um sinal
     if(tknext.categoria == SN && (tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
@@ -46,40 +50,69 @@ void termo(){
 
             while(1){
                 analex();
-                fator();
-                if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                tipo2 = fator();
+                printf("\n****CODIGO T2 EM TERMO: %d\n",tipo2);
+                if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+                    if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+                    if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else if(tipo1 == tipo2)
+                {
+                        if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
+                            break;
+                        }
+                    analex(); //vai pro sinal
+
+                }else{
+                    erroSemantico("Tipos de variav√©is diferentes termo");
+                }
+                /*if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
                     break;
                 }
-                analex(); //vai pro sinal
+                analex(); //vai pro sinal*/
 
             }//fim-while
 
 
     }//fimSe o proximo token for um sinal
 
-    return;
+    return tipo1;
 }
 
 /*OK*/
 int fator(){
+    int tipo;
+
     /*Se for Inteiro, Real ou Caractere*/
     if(tk.categoria == CT_I || tk.categoria == CT_R || tk.categoria == CT_C  || tk.categoria == CT_LT){
-        printf("\nSomente CTI, CTR, CTC OU CTLT");
-        return 1;
+
+        if(tk.categoria == CT_I) return INTEIRO;
+        if(tk.categoria == CT_C) return CARACTER;
+        if(tk.categoria == CT_R) return REAL;
     }
 
     /*Se for ID*/
     else if(tk.categoria == ID){
 
-         printf("\nLeu id");
 
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
-            printf("\nSomente id");
-            return 1;
+            printf("\n%c\n", tk.lexema);
+            tipo = PesquisarTipo(tk);
+
+            return tipo;
         }
 
-        printf("\nnao eh somente id");
 
         //Se for abrir parentesis
         if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_ABRE){
@@ -87,16 +120,16 @@ int fator(){
             //vai pro parentesis
             analex();
 
-            printf("\n ta no abre parentesis");
-            //Se o prÛximo token for fecha parentesis
+            //printf("\n ta no abre parentesis");
+            //Se o pr√≥ximo token for fecha parentesis
             if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_FECHA){
                 //Ve o proximo token e sai
-                printf("\n nada dentro do parentesis");
+                //printf("\n nada dentro do parentesis");
                 analex();
                 return 1;
             }
 
-            //Chama a funÁ„o de express√£o
+            //Chama a fun√ß√£o de express√É¬£o
             analex();
             expr();
 
@@ -154,7 +187,7 @@ int fator(){
 
     }
 
-    /* Se for negaÁ„o de express„o */
+    /* Se for nega√ß√£o de express√£o */
     else if(tk.categoria == SN && tk.cod == NEGACAO){
         printf("\eh negacao");
         analex();
@@ -169,11 +202,12 @@ int fator(){
 }
 
 /*OK*/
-void expr(){
+int expr(){
 
-    printf("\ncheguei em expr");
+    int tipo1, tipo2;
 
-    expr_simp();
+    tipo1 = expr_simp();
+    printf("\nCODIGO T1 EM EXPR: %d\n",tipo1);
 
     if(tknext.categoria == SN){
         //se o proximo token for op relacional
@@ -182,30 +216,59 @@ void expr(){
             opr_rel(); //confirma op_rel
 
             analex();
-            expr_simp();
+            tipo2 = expr_simp();
+            printf("\nCODIGO T2 EM EXPR: %d\n",tipo2);
+            if(tipo1 != tipo2)
+            {
+                erroSemantico("Tipos de variaveis diferentes!");
+            }
         }//fim-se o proximo token for op relacional
         else{
             //Erro, esperando operador relacional
             //erroSintatico("Falta operador relacional");
         }
     }
+
+    return tipo1;
+
 }
 
 /*OK*/
-void expr_simp(){
+int expr_simp(){
 
-    /*Se o termo comeÁar com + ou - */
+    int tipo1, tipo2;
+
+    /*Se o termo come√ßar com + ou - */
     if(tk.categoria == SN && (tk.cod == SOMA || tk.cod == SUB)){
         analex();
     }
 
-    termo();
+    tipo1 = termo();
+    printf("\n****CODIGO T1 EM Exp_SIMPLES: %d\n",tipo1);
 
     if(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR)){
         analex(); //vai pro sinal
         while(1){
+
             analex();
-            termo();
+            tipo2 = termo();
+            printf("\n****CODIGO T2 EM EXPR_SIMPLES: %d\n",tipo2);
+            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+
+
+                }else if(tipo1 == tipo2)
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variav√©is diferentes expr_simples");
+                }
+
             if(!(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR))){
                 break;
             }
@@ -214,6 +277,7 @@ void expr_simp(){
 
     }
 
+        return tipo1;
 }
 
 /*OK*/
@@ -257,8 +321,8 @@ void tipos_param(){
             //se for id
             if(tk.categoria == ID){
 
-                //Se n√£o houver o ID na tabela, ele insere
-                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
+                //Se n√É¬£o houver o ID na tabela, ele insere
+                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                     controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
 
                     //E Se esse proximo token for VIRG
@@ -272,19 +336,19 @@ void tipos_param(){
                                 analex();
                                 //Se for ID
                                 if(tk.categoria == ID){
-                                    if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
+                                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                                         controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                                     }else{
-                                        erroSintatico("ID j· existente");
+                                        erroSintatico("ID j√° existente");
                                     }
                                 }//Fim-Se for ID
                                 else{
-                                    erroSintatico("ID inv·lido");
+                                    erroSintatico("ID inv√°lido");
                                 }
 
                             }//Fim-Se for tipo
                             else{
-                                erroSintatico("Tipo inv·lido");
+                                erroSintatico("Tipo inv√°lido");
                             }
 
 
@@ -297,12 +361,12 @@ void tipos_param(){
 
                     }//fim-E Se esse proximo token for VIRG
                     else if(tknext.categoria == ID || tknext.categoria == PR){
-                        erroSintatico("… esperado virgula");
+                        erroSintatico("√â esperado virgula");
                     }
 
                 }else{
-                    //Erro id j√° existente na tabela
-                    erroSintatico("ID j· existente na tabela");
+                    //Erro id j√É¬° existente na tabela
+                    erroSintatico("ID j√° existente na tabela");
                 }
 
             }//fim-se for id
@@ -313,7 +377,7 @@ void tipos_param(){
 
         }//fim-tipo
         else{
-            //erro sint√°tico TIPO INVALIDO
+            //erro sint√É¬°tico TIPO INVALIDO
             erroSintatico("Tipo invalido");
         }
 
@@ -335,32 +399,32 @@ void tipos_p_opc(){
         guardarTipo = tipo();
         if(guardarTipo>=0){
 
-            //Se o prÛximo token for ID
+            //Se o pr√≥ximo token for ID
             if(tknext.categoria == ID){
                 analex();//to no id
-                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
+                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                     controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                 }
                 else{
-                    erroSintatico("ID j· existente");
+                    erroSintatico("ID j√° existente");
                 }
             }//fim-se for id
 
-            //Se o prÛximo token for virgula
+            //Se o pr√≥ximo token for virgula
             while(tknext.categoria == SN && tknext.cod == VIRG){
                 analex();//ta na virgula
                 analex();//ta no tipo
                 guardarTipo = tipo();
                 if(guardarTipo>=0){
 
-                    //Se o prÛximo token for ID
+                    //Se o pr√≥ximo token for ID
                     if(tknext.categoria == ID){
                         analex();//to no id
-                        if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
+                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                             controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                         }
                         else{
-                            erroSintatico("ID j· existente");
+                            erroSintatico("ID j√° existente");
                         }
                     }//fim-se for id
 
@@ -374,7 +438,7 @@ void tipos_p_opc(){
 
         }//fim-tipo
         else{
-            //erro sint√°tico TIPO INVALIDO
+            //erro sint√É¬°tico TIPO INVALIDO
             erroSintatico("Tipo invalido");
         }
 
@@ -384,25 +448,43 @@ void tipos_p_opc(){
 
 /*OK*/
 void atrib(){
-
+    int tipo1, tipo2;
     //Se  for ID
     if(tk.categoria == ID){
         analex();
 
-        //Se for um sinal de atribuiÁ„o
+        tipo1 = PesquisarTipo(tk);
+        printf("\nCODIGO DO ID EM ATRIB: %d\n",tipo1);
+        //Se for um sinal de atribui√ß√£o
         if(tk.categoria == SN && tk.cod == ATRIB){
 
             analex();
-            expr();
+            tipo2 = expr();
+            printf("\n***CODIGO DO ATRIB: %d\n",tipo2);
+            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
 
-        }//fim-Se for um sinal de atribuiÁ„o
+
+                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                {
+
+
+                }else if(tipo1 == tipo2)
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variav√©is diferentes!\n");
+                }
+
+        }//fim-Se for um sinal de atribui√ß√£o
         else{
-            erroSintatico("… esperado um sinal de atribuiÁ„o");
+            erroSintatico("√â esperado um sinal de atribui√ß√£o");
         }
 
     }//fim- se for id
     else{
-        erroSintatico("… esperado um ID");
+        erroSintatico("√â esperado um ID");
     }
 
 }
@@ -432,7 +514,7 @@ void cmd(){
 
                 default:
                     /*ERRO DE CATEGORIA*/
-                    erroSintatico("Sinal inv·lido! … esperado { ou ;");
+                    erroSintatico("Sinal inv√°lido! √â esperado { ou ;");
 
             }//fim-switch
 
@@ -454,7 +536,7 @@ void cmd(){
                             cmd();
 
                             //Saiu de CMD
-                            //Se o prÛximo token for SENAO
+                            //Se o pr√≥ximo token for SENAO
                             if(tknext.categoria == PR && tknext.cod == SENAO){
                                 analex(); //vai estar em senao
                                 analex();
@@ -469,7 +551,7 @@ void cmd(){
 
                     }//if PARENTESIS_ABRE
                     else {
-                        /*ERRO DE N¬O ABERTURA DE PARENT SE*/
+                        /*ERRO DE N√ÇO ABERTURA DE PARENT√äSE*/
                         erroSintatico("Esperado (");
                     }
                     break;
@@ -499,23 +581,23 @@ void cmd(){
                     //Se for parentesis
                     if(tk.categoria == SN && tk.cod == PARENTESIS_ABRE){
 
-                        //Se o proximo token for ID, ent„o ocorrer· a atribuiÁ„o 1
+                        //Se o proximo token for ID, ent√£o ocorrer√° a atribui√ß√£o 1
                         if(tknext.categoria == ID){
                             analex();
                             atrib();
                         }//-Fim possivel atrib 1
 
-                        //Verifica se o prÛximo token È PT_VIRG 1
+                        //Verifica se o pr√≥ximo token √© PT_VIRG 1
                         if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                             analex();//to no pt_virg 1
 
-                            //Verifica se prÛximo token È PT_VIRG 2
-                            //Se for, n„o ocorrer· expr
-                            //Se n„o for, pode ocorrer expr
+                            //Verifica se pr√≥ximo token √© PT_VIRG 2
+                            //Se for, n√£o ocorrer√° expr
+                            //Se n√£o for, pode ocorrer expr
                             if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                                 analex(); //to no pt_virg 2
 
-                                //Se o proximo token for ID, ent„o ocorrer· a atribuiÁ„o 2
+                                //Se o proximo token for ID, ent√£o ocorrer√° a atribui√ß√£o 2
                                 if(tknext.categoria == ID){
                                     analex();
                                     atrib();
@@ -525,29 +607,29 @@ void cmd(){
                                         analex();//prepatativo pro cmd
                                         cmd();
                                     }else{
-                                        erroSintatico("… esperado FECHA PARENTESIS1");
+                                        erroSintatico("√â esperado FECHA PARENTESIS1");
                                     }
 
 
 
                                 }//-Fim possivel atrib 2
                                 else if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_FECHA)){
-                                    //sob observaÁ„o
-                                    erroSintatico("… esperado FECHA PARENTESIS3");
+                                    //sob observa√ß√£o
+                                    erroSintatico("√â esperado FECHA PARENTESIS3");
                                 }
 
 
                             }//FIM-SE FOR PT_VIRG 2
-                            //Caso n„o for PTVIRG, pode ocorrer expr
+                            //Caso n√£o for PTVIRG, pode ocorrer expr
                             else{
                                 analex();
                                 expr();
 
-                                //… esperado PT_VIRG 2 APOS EXPR
+                                //√â esperado PT_VIRG 2 APOS EXPR
                                 if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                                     analex(); //to no pt_virg 2
 
-                                    //Se o proximo token for ID, ent„o ocorrer· a atribuiÁ„o 2
+                                    //Se o proximo token for ID, ent√£o ocorrer√° a atribui√ß√£o 2
                                     if(tknext.categoria == ID){
                                         analex();
                                         atrib();
@@ -557,30 +639,30 @@ void cmd(){
                                             analex();//prepatativo pro cmd
                                             cmd();
                                         }else{
-                                            erroSintatico("… esperado FECHA PARENTESIS2");
+                                            erroSintatico("√â esperado FECHA PARENTESIS2");
                                         }
                                     }else if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_FECHA)){
-                                        //sob observaÁ„o
-                                        erroSintatico("… esperado FECHA PARENTESIS4");
+                                        //sob observa√ß√£o
+                                        erroSintatico("√â esperado FECHA PARENTESIS4");
                                     }
 
 
                                 }//fIM-ESPERADO PT_VIRG2 APOS EXPR
                                 else{
-                                    erroSintatico("… esperado PT_VIRG");
+                                    erroSintatico("√â esperado PT_VIRG");
                                 }
 
                             }//fim-pode ocorrer expr
 
                         }//FIM-SE FOR PT_VIRG 1
                         else{
-                            erroSintatico("… esperado PT_VIRG");
+                            erroSintatico("√â esperado PT_VIRG");
                         }
 
 
                     }//Fim- se for parentesis
                     else{
-                        erroSintatico("… esperado PARENTESIS_ABRE");
+                        erroSintatico("√â esperado PARENTESIS_ABRE");
                     }
 
                     break;
@@ -591,7 +673,7 @@ void cmd(){
                         break;
                     }
 
-                    //Se n„o entrou no if do pt e virg
+                    //Se n√£o entrou no if do pt e virg
                     analex();
                     expr();
                     analex();
@@ -603,7 +685,7 @@ void cmd(){
                     break;
 
                 default:
-                    /*ERRO de comando n„o esperado*/
+                    /*ERRO de comando n√£o esperado*/
                     erroSintatico("Cmd invalido");
 
 
@@ -615,15 +697,15 @@ void cmd(){
         //SE FOR ID
         else if(tk.categoria == ID){
 
-            //olha o proximo token, se for atribuiÁ„o
-            //temos uma atribuiÁ„o
+            //olha o proximo token, se for atribui√ß√£o
+            //temos uma atribui√ß√£o
             if(tknext.categoria == SN && tknext.cod == ATRIB){
-                atrib(); //n„o chama analex pq ele j· vai t· no id
+                atrib(); //n√£o chama analex pq ele j√° vai t√° no id
                 analex();
                 if(tk.categoria == SN && tk.cod == PT_VIRG){
                     return;
                 }else{
-                    erroSintatico("Falta PT_VIRG ; apÛs atribuiÁ„o");
+                    erroSintatico("Falta PT_VIRG ; ap√≥s atribui√ß√£o");
                 }
 
             }//fim se for atrib
@@ -633,9 +715,9 @@ void cmd(){
             else if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE){
                 //Ta no id
 
-                analex(); //passa pro prÛximo token
+                analex(); //passa pro pr√≥ximo token
 
-                //Se o prÛximo token for fecha parentesis
+                //Se o pr√≥ximo token for fecha parentesis
                 if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_FECHA){
                     analex();
                     //O proximo token tem que ser ponto e virgula
@@ -644,13 +726,13 @@ void cmd(){
                         analex();
                         return;
                     }else{
-                        //Se n„o for, d· erro
+                        //Se n√£o for, d√° erro
                         erroSintatico("Falta PT_VIRG");
                     }
                 }
 
 
-                //Chama a funÁ„o de express√£o
+                //Chama a fun√ß√£o de express√É¬£o
                 analex();
                 expr();
 
@@ -671,13 +753,13 @@ void cmd(){
                 analex();
                 //If para checar se houve fechar parentesis
                 if((tk.categoria == SN && tk.cod == PARENTESIS_FECHA)){
-                    //Agora vai ver se o proximo token È pt_virg
+                    //Agora vai ver se o proximo token √© pt_virg
                     if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                         analex();
                         return;
-                    }//fim-se È pt_virg
+                    }//fim-se √© pt_virg
                     else{
-                        //n„o encontrou pt_virg
+                        //n√£o encontrou pt_virg
                         erroSintatico("Falta PT_VIRG");
                     }
                 }//If encontrou fecha parentesis
@@ -695,13 +777,13 @@ void cmd(){
 
         }//fim- if id
         else{
-            erroSintatico("Cmd inv·lido");
+            erroSintatico("Cmd inv√°lido");
         }
 
 
     }//If PR ou ID ou SN
     else{
-        erroSintatico("Cmd inv·lido");
+        erroSintatico("Cmd inv√°lido");
     }
 }//void
 /*Obs: se der erro em cmd, provavelmente seja por conta dos dois ultimos elses ;*/
@@ -937,25 +1019,25 @@ void prog(){
                                                     analex();//ta no tipo
                                                     guardarTipo = tipo();
                                                     printf("\nTo no tipo");
-                                                    //Se o prÛximo token for ID
+                                                    //Se o pr√≥ximo token for ID
                                                     if(tknext.categoria == ID){
-                                                        analex();//t· no id
+                                                        analex();//t√° no id
 
                                                         //Insere ID na tabela
                                                         if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                                                             controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
                                                         }else{
-                                                            erroSintatico("ID j· existente");
+                                                            erroSintatico("ID j√° existente");
                                                         }
 
                                                         printf("\nTo no id");
 
-                                                        //Enquanto TNEXT for vÌrgula
+                                                        //Enquanto TNEXT for v√≠rgula
                                                         while(tknext.categoria == SN && tknext.cod == VIRG){
                                                             printf("\nEntrei no while2");
                                                             analex();//Pra pegar a virgula
                                                             if(tknext.categoria != ID){
-                                                                erroSintatico("Eh esperado ID apÛs virgula");
+                                                                erroSintatico("Eh esperado ID ap√≥s virgula");
                                                             }
                                                             analex();//pra pegar o ID
 
@@ -963,7 +1045,7 @@ void prog(){
                                                             if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                                                                 controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
                                                             }else{
-                                                                erroSintatico("ID j· existente");
+                                                                erroSintatico("ID j√° existente");
                                                             }
 
                                                             if(!(tknext.categoria == SN && tknext.cod == VIRG) && !(tknext.categoria == SN && tknext.cod == PT_VIRG)){
@@ -972,14 +1054,14 @@ void prog(){
                                                         }
 
                                                         if(!(tknext.categoria == SN && tknext.cod == PT_VIRG)){
-                                                            erroAnalisadorLexico("… esperado PT_VIRG");
+                                                            erroAnalisadorLexico("√â esperado PT_VIRG");
                                                         }
                                                         analex(); //pergou pt e virgula
                                                         printf("\nPeguei o ponto e virgula");
 
                                                     }//Fim-se tknext for id
                                                     else{
-                                                        erroAnalisadorLexico("ApÛs tipo È esperado ID");
+                                                        erroAnalisadorLexico("Ap√≥s tipo √© esperado ID");
                                                     }
 
 
@@ -1053,25 +1135,25 @@ void prog(){
                                     analex();//ta no tipo
                                     guardarTipo = tipo();
                                     printf("\nTo no tipo");
-                                    //Se o prÛximo token for ID
+                                    //Se o pr√≥ximo token for ID
                                     if(tknext.categoria == ID){
-                                        analex();//t· no id
+                                        analex();//t√° no id
 
                                         //Insere ID na tabela
                                         if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                                             controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
                                         }else{
-                                            erroSintatico("ID j· existente");
+                                            erroSintatico("ID j√° existente");
                                         }
 
                                         printf("\nTo no id");
 
-                                        //Enquanto TNEXT for vÌrgula
+                                        //Enquanto TNEXT for v√≠rgula
                                         while(tknext.categoria == SN && tknext.cod == VIRG){
                                             printf("\nEntrei no while2");
                                             analex();//Pra pegar a virgula
                                             if(tknext.categoria != ID){
-                                                erroSintatico("Eh esperado ID apÛs virgula");
+                                                erroSintatico("Eh esperado ID ap√≥s virgula");
                                             }
                                             analex();//pra pegar o ID
 
@@ -1079,7 +1161,7 @@ void prog(){
                                             if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
                                                 controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, VAR, NAO_ZUMBI);
                                             }else{
-                                                erroSintatico("ID j· existente");
+                                                erroSintatico("ID j√° existente");
                                             }
 
                                             if(!(tknext.categoria == SN && tknext.cod == VIRG) && !(tknext.categoria == SN && tknext.cod == PT_VIRG)){
@@ -1088,14 +1170,14 @@ void prog(){
                                         }
 
                                         if(!(tknext.categoria == SN && tknext.cod == PT_VIRG)){
-                                            erroAnalisadorLexico("… esperado PT_VIRG");
+                                            erroAnalisadorLexico("√â esperado PT_VIRG");
                                         }
                                         analex(); //pergou pt e virgula
                                         printf("\nPeguei o ponto e virgula");
 
                                     }//Fim-se tknext for id
                                     else{
-                                        erroAnalisadorLexico("ApÛs tipo È esperado ID");
+                                        erroAnalisadorLexico("Ap√≥s tipo √© esperado ID");
                                     }
 
 
@@ -1133,7 +1215,7 @@ void prog(){
                                     controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI);
                                 }else// if 71
                                 {
-                                    erroSintatico("Dupla decraraÁ„o");
+                                    erroSintatico("Dupla decrara√ß√£o");
                                 }// if 71
                             }
 
@@ -1156,7 +1238,7 @@ void prog(){
 
                  }else// if 71
                 {
-                    erroSintatico("Dupla decraraÁ„o");
+                    erroSintatico("Dupla decrara√ß√£o");
                 }// if 71
             }// if 72
 
@@ -1175,12 +1257,12 @@ void anasin(){
     analex();
     analex();
 
-    //enquanto n„o for fim de arquivo
+    //enquanto n√£o for fim de arquivo
     while(!feof(arquivo)){
         prog();
         analex();
         printf("\nLinha: %d",linhas);
-    }//fim-enquanto n„o for fim de arquivo
+    }//fim-enquanto n√£o for fim de arquivo
 }
 
 int main(){
@@ -1191,14 +1273,13 @@ int main(){
     /*ABRE O ARQUIVO*/
 	if ( (arquivo = fopen(nomeArquivo,"r")) != NULL ){
         printf("\n\tArquivo aberto com sucesso!\n");
-        iniciarTabelaDeSimbolos();
 
         anasin();
 
         fclose(arquivo);
     }
     else{
-        printf("\n\tN„o foi possÌvel abrir o arquivo %s\n", nomeArquivo);
+        printf("\n\tN√£o foi poss√≠vel abrir o arquivo %s\n", nomeArquivo);
         system("pause");
         exit(1);
     }
