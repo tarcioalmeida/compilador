@@ -80,6 +80,7 @@ int consultar(char *lexema, int escopo, int prototipo){
     return FALSO;
 }
 
+/*Vai consultar se os parametros de uma função se repete*/
 int consultarParam(char *lexema, int escopo){
     int i = topo;
 
@@ -102,6 +103,57 @@ int consultarParam(char *lexema, int escopo){
     }
 
     return FALSO;
+}
+
+/*Vai consultar o indice de uma determinada função na tabela de simbolos e retornar ele*/
+/*Se não encontrar, retorna -1*/
+int consultarFunc(char *lexema){
+    int i = topo;
+
+    if(topo == -1){
+        return -1;
+    }
+
+    for(i = topo; i!=-1; i--){
+
+        if(tabela[i].categoria == FUNC && strcmp(tabela[i].lexema, lexema)==0){
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+/*vai consultar se determinada função tem prototipo*/
+int consultarPrototipo(char *lexema){
+    int i = topo;
+
+    if(topo == -1){
+        return FALSO;
+    }
+
+    for(i = topo; i!=-1; i--){
+
+        if(tabela[i].categoria == FUNC && strcmp(tabela[i].lexema, lexema)==0){
+            if(tabela[i].prototipo == PROTO){
+                return VERDADEIRO;
+            }else{
+                return FALSO;
+            }
+        }
+    }
+
+    return FALSO;
+}
+
+int checarTipoParam(int indice, int tipo){
+
+    if(tabela[indice].tipo == tipo){
+        return VERDADEIRO;
+    }else{
+        return FALSO;
+    }
+
 }
 
 void imprimirTabela(){

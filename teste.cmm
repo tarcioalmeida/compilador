@@ -9,13 +9,13 @@ semretorno principal(semparam) {
      imprima("Digite a qtd de termos da sequencia: ");
      leia(n);
      imprima("A sequencia de Fibonacci solicitada eh: ");
-     imprima(enter);
+     imprima("teste");
      para (i=0; i<n; i=i+1) 
             imprima(fibonacci(i+1));
       retorne;
 }
 
-inteiro fibbonaci(inteiro num) {
+inteiro fibonacci(inteiro num) {
 
       se ((num==1) || (num==2)) retorne 1;
       senao 
