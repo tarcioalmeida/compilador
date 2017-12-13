@@ -30,6 +30,10 @@ int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int 
         case CONSULTAR:
             return(consultar(lexema, escopo));
             break;
+
+        case CONSULTARPARAM:
+            return(consultarParam(lexema, escopo));
+            break;
     }//fim-switch
 
     return 0;
@@ -70,6 +74,30 @@ int consultar(char *lexema, int escopo){
 			}
 		}
 
+    }
+
+    return FALSO;
+}
+
+int consultarParam(char *lexema, int escopo){
+    int i = topo;
+
+    if(topo == -1){
+        return FALSO;
+    }
+
+    for(i = topo; i!=-1; i--){
+
+        if(tabela[i].categoria == FUNC){
+            break;
+        }
+		if(strcmp(tabela[i].lexema, lexema)==0){
+			if(tabela[i].escopo == escopo){
+				return VERDADEIRO;
+			}else{
+				return FALSO;
+			}
+		}
     }
 
     return FALSO;

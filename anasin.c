@@ -258,7 +258,7 @@ void tipos_param(){
             if(tk.categoria == ID){
 
                 //Se nÃ£o houver o ID na tabela, ele insere
-                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
+                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
                     controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
 
                     //E Se esse proximo token for VIRG
@@ -272,7 +272,7 @@ void tipos_param(){
                                 analex();
                                 //Se for ID
                                 if(tk.categoria == ID){
-                                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
+                                    if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
                                         controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                                     }else{
                                         erroSintatico("ID já existente");
@@ -338,7 +338,7 @@ void tipos_p_opc(){
             //Se o próximo token for ID
             if(tknext.categoria == ID){
                 analex();//to no id
-                if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
+                if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
                     controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                 }
                 else{
@@ -356,7 +356,7 @@ void tipos_p_opc(){
                     //Se o próximo token for ID
                     if(tknext.categoria == ID){
                         analex();//to no id
-                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0)){
+                        if(!controlador_TabSimb(CONSULTARPARAM, tk.lexema, 0, LOCAL, 0, 0)){
                             controlador_TabSimb(EMPILHAR, tk.lexema, guardarTipo, LOCAL, PARAM, SIM_ZUMBI);
                         }
                         else{
@@ -1191,6 +1191,7 @@ int main(){
     /*ABRE O ARQUIVO*/
 	if ( (arquivo = fopen(nomeArquivo,"r")) != NULL ){
         printf("\n\tArquivo aberto com sucesso!\n");
+        iniciarTabelaDeSimbolos();
 
         anasin();
 

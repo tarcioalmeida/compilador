@@ -16,7 +16,7 @@ typedef struct linhaTabSimb{
 }Linha_TabSimb;
 
 /*Enum para deixar o código claro */
-enum{EMPILHAR = -2, DESEMPILHAR = -3, CONSULTAR = -4} operations;
+enum{EMPILHAR = -2, DESEMPILHAR = -3, CONSULTAR = -4, CONSULTARPARAM = -50}operations;
 enum{LOCAL = -6, GLOBAL = -7}escopo;
 enum{SIM_ZUMBI = 1, NAO_ZUMBI = 0}zumbi;
 enum{FUNC = -10, PARAM = -11, VAR = -12}categoria;
@@ -31,6 +31,7 @@ int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int 
 void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi);
 void desempilhar();
 int consultar(char lexema[], int escopo);
+int consultarParam(char lexema[], int escopo);
 void imprimirTabela();
 
 #endif
