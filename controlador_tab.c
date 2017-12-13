@@ -8,7 +8,7 @@ void iniciarTabelaDeSimbolos(){
 }
 
 /*Função principal*/
-int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int categoria, int zumbi){
+int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int categoria, int zumbi, int prototipo){
 
     switch (operation){
         case EMPILHAR:
@@ -17,7 +17,7 @@ int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int 
                 printf("\nPilha cheia!");
                 exit(1);
             }else{
-                empilhar(lexema, tipo, escopo, categoria, zumbi);
+                empilhar(lexema, tipo, escopo, categoria, zumbi, prototipo);
                 return 1;
             }
             break;
@@ -28,7 +28,7 @@ int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int 
             break;
 
         case CONSULTAR:
-            return(consultar(lexema, escopo));
+            return(consultar(lexema, escopo, prototipo));
             break;
 
         case CONSULTARPARAM:
@@ -39,7 +39,7 @@ int controlador_TabSimb(int operation, char lexema[], int tipo, int escopo, int 
     return 0;
 }
 
-void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi){
+void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi, int prototipo){
 
     topo++;
 
@@ -49,6 +49,7 @@ void empilhar(char lexema[], int tipo, int escopo, int categoria, int zumbi){
     tabela[topo].escopo = escopo;
     tabela[topo].categoria = categoria;
     tabela[topo].zumbi = zumbi;
+    tabela[topo].prototipo = prototipo;
 }
 
 void desempilhar(){
@@ -57,7 +58,7 @@ void desempilhar(){
     }
 }
 
-int consultar(char *lexema, int escopo){
+int consultar(char *lexema, int escopo, int prototipo){
     int i = topo;
 
     if(topo == -1){
@@ -144,3 +145,4 @@ int PesquisarTipo(token tk)
 
     erroSemantico("Variavel nao declarada!");
 }
+
