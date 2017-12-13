@@ -699,6 +699,10 @@ void cmd(){
 
             //olha o proximo token, se for atribuição
             //temos uma atribuição
+		
+		
+            PesquisarTipo(tk); // Verifica se o ID foi declarado
+		
             if(tknext.categoria == SN && tknext.cod == ATRIB){
                 atrib(); //não chama analex pq ele já vai tá no id
                 analex();
