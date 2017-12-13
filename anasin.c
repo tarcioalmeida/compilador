@@ -2,7 +2,7 @@
 
 void erroSintatico(char erro[]){
 
-    printf("\nERRO SINTÁTICO na Linha %d: %s", linhas, erro);
+    printf("\nERRO SINTÁTICO na Linha %d: %s\n", linhas, erro);
 
     system("pause");
     exit(1);
@@ -10,7 +10,7 @@ void erroSintatico(char erro[]){
 
 void erroSemantico(char erro[]){
 
-    printf("\nERRO SEMANTICO na Linha %d: %s", linhas, erro);
+    printf("\nERRO SEMANTICO na Linha %d: %s\n", linhas, erro);
 
     system("pause");
     exit(1);
