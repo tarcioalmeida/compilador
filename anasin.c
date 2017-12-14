@@ -65,7 +65,7 @@ int termo(){
                     analex(); //vai pro sinal
 
                 }else{
-                    erroSemantico("Tipos de variavéis diferentes termo");
+                    erroSemantico("Tipos de variavéis diferentes termo!");
                 }
                 /*if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
                     break;
@@ -82,7 +82,9 @@ int termo(){
 
 /*OK*/
 int fator(){
-    int tipo;
+    int tipo, tipo_funcao;
+    char lexema[TAM_LEXEMA];
+    int i;
 
     /*Se for Inteiro, Real ou Caractere*/
     if(tk.categoria == CT_I || tk.categoria == CT_R || tk.categoria == CT_C  || tk.categoria == CT_LT){
@@ -95,9 +97,23 @@ int fator(){
     /*Se for ID*/
     else if(tk.categoria == ID){
 
-	 tipo = PesquisarTipo(tk);
-	    
-	    
+
+        tipo = PesquisarTipo(tk);
+        tipo_funcao =pegarFuncao();
+        imprimirTabela();
+        printf("\n\nVARIAVEL: %d e FUNCAO %d\n\n", tipo, tipo_funcao);
+                if((tipo == INTEIRO || tipo == CARACTER || tipo== BOOLEANO) && (tipo_funcao == INTEIRO || tipo_funcao==BOOLEANO || tipo_funcao==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+
+
+                }else if(tipo == tipo_funcao)// SE FOREM DO MESMO TIPO, O REAL ENTRA AQUI
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variaveis diferentes fator!");
+                }
+
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
 
@@ -107,6 +123,12 @@ int fator(){
 
         //Se for abrir parentesis
         if(tknext.categoria == SN && tknext.cod ==  PARENTESIS_ABRE){
+
+            i = consultarFunc(lexema);
+            if(!(tabela[i].tipo == INTEIRO || tabela[i].tipo == BOOLEANO || tabela[i].tipo == REAL|| tabela[i].tipo == CARACTER))
+            {
+                erroSemantico("Atribuicao com erro!");
+            }
 
             //vai pro parentesis
             analex();
@@ -259,7 +281,7 @@ int expr_simp(){
 
 
                 }else{
-                    erroSemantico("Tipos de variavéis diferentes expr_simples");
+                    erroSemantico("Tipos de variaveis diferentes expr_simples");
                 }
 
 
@@ -665,6 +687,8 @@ void cmd(){
 
                 case RETORNE:
 
+
+                     printf("\n ****VIM NO RETORNE\n");
                     if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                         tipo_func = -1;
                         tipo_func = pegarFuncao();
@@ -678,6 +702,7 @@ void cmd(){
 
                     tipo_func = -1;
                     tipo_func = pegarFuncao();
+                    printf("\n ***TEM EXPR\n");
 
                     if(!(tipo_func == INTEIRO || tipo_func == BOOLEANO || tipo_func == REAL|| tipo_func == CARACTER))
                     {
@@ -687,8 +712,11 @@ void cmd(){
                     {
 
                             //Se não entrou no if do pt e virg
+                            printf("\n ****VIM NO TIPO DA FUNCAO\n");
                             analex();
+                            //imprimirTabela();
                             tipo1 = expr();
+                            printf("\n ****VIM NO RETORNE\n");
                             if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo_func== INTEIRO || tipo_func==BOOLEANO || tipo_func==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
                             {
 
@@ -825,6 +853,7 @@ void cmd(){
 
 void prog(){
     int guardarTipo;
+    int guarda_tipo;
     //analex();
     if(tk.categoria == PR && tipo() < 0)// if 1
     {
@@ -839,10 +868,9 @@ void prog(){
                     if(tknext.categoria == ID)// if 3
                     {
                         printf("ID \n");
-                        analex();
                        if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 10
                         {
-                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, PROTO);
+                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, FUNC, SIM_ZUMBI, PROTO);
 
                             if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 4
                             {
@@ -865,7 +893,7 @@ void prog(){
                                                             analex();
                                                              if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, LOCAL, 0, 0, PROTO))// if 11
                                                             {
-                                                                controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, LOCAL, PARAM, SIM_ZUMBI, PROTO);
+                                                                controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, LOCAL, FUNC, SIM_ZUMBI, PROTO);
                                                                  /*if(tknext.categoria == ID)// if 6
                                                                 {
 
@@ -927,14 +955,17 @@ void prog(){
                 {
                     analex();
                     printf("Tipo\n");
-                    tipo();
+                    guarda_tipo = tipo();
                     if(tknext.categoria == ID)// if 3
                     {
                         analex();
-                         printf("ID\n");
+
+                        printf("ID\n");
+                        printf("\n\nCODIGO DA FUNCAO: %d %s************\n\n", tk.cod, tk.lexema);
+
                         if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 10
                         {
-                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, FUNC, SIM_ZUMBI, PROTO);
+                            controlador_TabSimb(EMPILHAR, tk.lexema, guarda_tipo, GLOBAL, FUNC, SIM_ZUMBI, PROTO);
 
                             if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 4
                             {
@@ -1142,6 +1173,7 @@ void prog(){
 
     }else if(tipo() >= 0)//else if do if 1
     {
+            guarda_tipo = tipo();
             printf("*****SOU UM TIPO LINDO*****  \n");
             if(tknext.categoria == ID )// if 72
             {
@@ -1149,7 +1181,7 @@ void prog(){
                  analex();
                 if(controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 71
                  {
-                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, FUNC, SIM_ZUMBI, N_PROTO);
+                    controlador_TabSimb(EMPILHAR, tk.lexema, guarda_tipo, GLOBAL, FUNC, SIM_ZUMBI, N_PROTO);
                     if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 73
                     {
                         analex();
