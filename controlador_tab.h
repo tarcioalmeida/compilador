@@ -39,5 +39,6 @@ int consultarPrototipo(char *lexema);
 int checarTipoParam(int indice, int tipo);
 void imprimirTabela();
 int PesquisarTipo(token tk);
+int pegarFuncao();
 
 #endif
