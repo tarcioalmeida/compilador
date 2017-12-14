@@ -486,6 +486,7 @@ void atrib(){
 void cmd(){
 
     int tipo_func = -1;
+    int tipo1 = -1;
 
     if(tk.categoria == PR || tk.categoria == ID || tk.categoria == SN){
 
@@ -666,26 +667,53 @@ void cmd(){
                 case RETORNE:
 
                     if(tknext.categoria == SN && tknext.cod == PT_VIRG){
+                        tipo_func = -1;
+                        tipo_func = pegarFuncao();
+                        if((tipo_func == INTEIRO || tipo_func == BOOLEANO || tipo_func == REAL|| tipo_func == CARACTER))
+                        {
+                            erroSemantico("Retorno sem valor!");
+                        }
                         analex();
                         break;
                     }
 
+                    tipo_func = -1;
                     tipo_func = pegarFuncao();
+
                     if(!(tipo_func == INTEIRO || tipo_func == BOOLEANO || tipo_func == REAL|| tipo_func == CARACTER))
                     {
-                        erroSemantico("Impossivel retornar valor");
-                    }
+                        erroSemantico("Impossivel retornar valor!");
+
+                    }else if((tipo_func == INTEIRO || tipo_func == BOOLEANO || tipo_func == REAL|| tipo_func == CARACTER))
+                    {
+
+                            //Se não entrou no if do pt e virg
+                            analex();
+                            tipo1 = expr();
+                            if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo_func== INTEIRO || tipo_func==BOOLEANO || tipo_func==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                            {
 
 
-                    //Se não entrou no if do pt e virg
-                    analex();
-                    expr();
-                    analex();
-                    if(tk.categoria == SN && tk.cod == PT_VIRG){
-                        break;
+                            }else if(tipo1 == tipo_func)// SE FOREM DO MESMO TIPO, O REAL ENTRA AQUI
+                            {
+
+
+                            }else{
+                                erroSemantico("Tipos de variaveis diferentes!");
+                            }
+                            analex();
+                            if(tk.categoria == SN && tk.cod == PT_VIRG){
+                                break;
+                            }else{
+                                erroSintatico("Falta PT_VIRG ;");
+                            }
+
                     }else{
-                        erroSintatico("Falta PT_VIRG ;");
+
+                        erroSemantico("A funcao exige um retorne!");
+
                     }
+
                     break;
 
                 default:
@@ -907,7 +935,7 @@ void prog(){
                          printf("ID\n");
                         if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, PROTO))// if 10
                         {
-                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, PROTO);
+                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, FUNC, SIM_ZUMBI, PROTO);
 
                             if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 4
                             {
@@ -1122,7 +1150,7 @@ void prog(){
                  analex();
                 if(controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 71
                  {
-                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, N_PROTO);
+                    controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, FUNC, SIM_ZUMBI, N_PROTO);
                     if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 73
                     {
                         analex();
@@ -1197,6 +1225,8 @@ void prog(){
 
                                 //chamar CMD
                                 printf("\nTalvez ocorra cmd");
+
+
                                 while(!(tknext.categoria == SN && tknext.cod == CHAVES_FECHA)){
                                     analex();
                                     printf("\nvai ocorrer cmd");
@@ -1275,6 +1305,7 @@ void anasin(){
         analex();
         printf("\nLinha: %d",linhas);
     }//fim-enquanto não for fim de arquivo
+
 }
 
 int main(){
