@@ -198,3 +198,22 @@ int PesquisarTipo(token tk)
     erroSemantico("Variavel nao declarada!");
 }
 
+int pegarFuncao()
+{
+    int i = topo;
+
+    if(topo == -1){
+        return FALSO;
+    }
+
+        for(i = topo; i!=-1; i--){
+              if(tabela[i].categoria == FUNC)
+                {
+                    return tabela[i].tipo;
+                    break;
+                }
+        }
+
+
+}
+
