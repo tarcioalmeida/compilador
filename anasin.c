@@ -99,7 +99,7 @@ int fator(){
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
             printf("\n%c\n", tk.lexema);
-		
+
             tipo = PesquisarTipo(tk);
 
             return tipo;
@@ -484,6 +484,9 @@ void atrib(){
 
 /*OK*/
 void cmd(){
+
+    int tipo_func = -1;
+
     if(tk.categoria == PR || tk.categoria == ID || tk.categoria == SN){
 
         //Se for sinal
@@ -661,10 +664,18 @@ void cmd(){
                     break;
 
                 case RETORNE:
+
                     if(tknext.categoria == SN && tknext.cod == PT_VIRG){
                         analex();
                         break;
                     }
+
+                    tipo_func = pegarFuncao();
+                    if(!(tipo_func == INTEIRO || tipo_func == BOOLEANO || tipo_func == REAL|| tipo_func == CARACTER))
+                    {
+                        erroSemantico("Impossivel retornar valor");
+                    }
+
 
                     //Se não entrou no if do pt e virg
                     analex();
@@ -692,10 +703,10 @@ void cmd(){
 
             //olha o proximo token, se for atribuição
             //temos uma atribuição
-		
-		
+
+
             PesquisarTipo(tk); // Verifica se o ID foi declarado
-		
+
             if(tknext.categoria == SN && tknext.cod == ATRIB){
                 atrib(); //não chama analex pq ele já vai tá no id
                 analex();
@@ -979,26 +990,27 @@ void prog(){
        }else if(tk.cod == SEMRETORNO)// fecha if prototipo
        {
 
-                printf("SEM RETORNO \n");
+                printf("***********SEM RETORNO \n");
                 if(tknext.categoria == ID )// if 20
                 {
-                    printf("ID \n");
+                    printf("*******ID \n");
                     analex();
-                    if(!controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 21
+                    if(controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 21
                       {
+                          printf("**********NAO ESTOU NA TABELA");
                            controlador_TabSimb(EMPILHAR, tk.lexema, tk.cod, GLOBAL, PARAM, SIM_ZUMBI, N_PROTO);
                            if(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)// if 23
                             {
-                                printf("ABRE PARENTESI \n");
+                                printf("*******ABRE PARENTESI \n");
                                 analex();// vai para o parentesi
-                                printf("TIPOS_PARM \n");
+                                printf("*****TIPOS_PARM \n");
                                 analex();//vai para o tipos_param
                                 tipos_param();
                               if(tknext.categoria == SN && tknext.cod == PARENTESIS_FECHA)// if 24
                                {
 
 
-                                    printf("PAARENTESI FECHA \n");
+                                    printf("*****PAARENTESI FECHA \n");
                                     analex();
                                     //Espera pelo abre chaves
                                             if(tknext.categoria == SN && tknext.cod == CHAVES_ABRE){
@@ -1012,10 +1024,10 @@ void prog(){
                                                 }
                                                 //Enquanto tnext for tipo
                                                 while(tknext.categoria == PR && (tknext.cod == CARACTER || tknext.cod == INTEIRO || tknext.cod == REAL ||tknext.cod == BOOLEANO)){
-                                                    printf("\nEntrei no while");
+                                                    printf("\n********Entrei no while");
                                                     analex();//ta no tipo
                                                     guardarTipo = tipo();
-                                                    printf("\nTo no tipo");
+                                                    printf("\n*****To no tipo");
                                                     //Se o próximo token for ID
                                                     if(tknext.categoria == ID){
                                                         analex();//tá no id
@@ -1069,7 +1081,10 @@ void prog(){
                                                 while(!(tknext.categoria == SN && tknext.cod == CHAVES_FECHA)){
                                                     analex();
                                                     printf("\nvai ocorrer cmd");
-                                                    cmd();
+
+
+                                                        cmd();
+
                                                 }
 
                                                 //Apos encontrar o fecha chaves, desempilha a tabela de sinais
@@ -1100,10 +1115,10 @@ void prog(){
 
     }else if(tipo() >= 0)//else if do if 1
     {
-            printf("TIPO \n");
+            printf("*****SOU UM TIPO LINDO*****  \n");
             if(tknext.categoria == ID )// if 72
             {
-                 printf("ID \n");
+                 printf("VIM NO ID \n");
                  analex();
                 if(controlador_TabSimb(CONSULTAR, tk.lexema, 0, GLOBAL, 0, 0, N_PROTO))// if 71
                  {
