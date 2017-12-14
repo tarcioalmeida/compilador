@@ -1242,7 +1242,7 @@ void prog(){
 
                  }else// if 71
                 {
-                    erroSintatico("Dupla decraração");
+                     erroSemantico("Funcao nao declarada!");
                 }// if 71
             }// if 72
 
