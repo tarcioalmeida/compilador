@@ -95,12 +95,11 @@ int fator(){
     /*Se for ID*/
     else if(tk.categoria == ID){
 
-
+	 tipo = PesquisarTipo(tk);
+	    
+	    
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
-            printf("\n%c\n", tk.lexema);
-
-            tipo = PesquisarTipo(tk);
 
             return tipo;
         }
