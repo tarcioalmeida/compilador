@@ -50,14 +50,7 @@ int termo(){
                 analex();
                 tipo2 = fator();
                 printf("\n****CODIGO T2 EM TERMO: %d\n",tipo2);
-                if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
-                {
-                    if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
-                            break;
-                        }
-                    analex(); //vai pro sinal
-
-                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
+                if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo2 == INTEIRO || tipo2==BOOLEANO || tipo2==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
                 {
                     if(!(tknext.cod == MULT || tknext.cod == DIV || tknext.cod == AND)){
                             break;
@@ -106,6 +99,7 @@ int fator(){
         if(!(tknext.categoria == SN && tknext.cod == PARENTESIS_ABRE)){
             //Se for somente ID
             printf("\n%c\n", tk.lexema);
+		
             tipo = PesquisarTipo(tk);
 
             return tipo;
@@ -215,11 +209,17 @@ int expr(){
 
             analex();
             tipo2 = expr_simp();
-            printf("\nCODIGO T2 EM EXPR: %d\n",tipo2);
-            if(tipo1 != tipo2)
-            {
-                erroSemantico("Tipos de variaveis diferentes!");
-            }
+           if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo2 == INTEIRO || tipo2==BOOLEANO || tipo2==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+                {
+
+
+                }else if(tipo1 == tipo2)// SE FOREM DO MESMO TIPO, O REAL ENTRA AQUI
+                {
+
+
+                }else{
+                    erroSemantico("Tipos de variavéis diferentes expr_simples");
+                }
         }//fim-se o proximo token for op relacional
         else{
             //Erro, esperando operador relacional
@@ -251,21 +251,18 @@ int expr_simp(){
             analex();
             tipo2 = termo();
             printf("\n****CODIGO T2 EM EXPR_SIMPLES: %d\n",tipo2);
-            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+ 		 if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo2 == INTEIRO || tipo2==BOOLEANO || tipo2==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
                 {
 
 
-                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
-                {
-
-
-                }else if(tipo1 == tipo2)
+                }else if(tipo1 == tipo2)// SE FOREM DO MESMO TIPO, O REAL ENTRA AQUI
                 {
 
 
                 }else{
                     erroSemantico("Tipos de variavéis diferentes expr_simples");
                 }
+
 
             if(!(tknext.categoria == SN && (tknext.cod == SOMA || tknext.cod == SUB || tknext.cod == OR))){
                 break;
@@ -460,20 +457,16 @@ void atrib(){
             analex();
             tipo2 = expr();
             printf("\n***CODIGO DO ATRIB: %d\n",tipo2);
-            if((tipo1==INTEIRO && (tipo2==BOOLEANO || tipo2==CARACTER)) || (tipo1==BOOLEANO && tipo2==INTEIRO))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
+            if((tipo1 == INTEIRO || tipo1== CARACTER || tipo1== BOOLEANO) && (tipo2 == INTEIRO || tipo2==BOOLEANO || tipo2==CARACTER))// SE FOR INTEIRO  E O OUTRO FOR UM BOOLEANO OU CARACTER
                 {
 
 
-                }else if(tipo1==CARACTER && tipo2==INTEIRO)//SE FOR CARACTER E O OUTRO UM INTEIRO
-                {
-
-
-                }else if(tipo1 == tipo2)
+                }else if(tipo1 == tipo2)// SE FOREM DO MESMO TIPO, O REAL ENTRA AQUI
                 {
 
 
                 }else{
-                    erroSemantico("Tipos de variavéis diferentes!\n");
+                    erroSemantico("Tipos de variavéis diferentes expr_simples");
                 }
 
         }//fim-Se for um sinal de atribuição
