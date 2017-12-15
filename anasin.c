@@ -405,7 +405,7 @@ void tipos_param(){
         }//fim-tipo
         else{
             //erro sintÃ¡tico TIPO INVALIDO
-            erroSintatico("Tipo invalido");
+            erroSintatico("Tipo invalido ou Esperado Parametros");
         }
 
     }//FIM-ELSE PR
@@ -457,7 +457,7 @@ void tipos_p_opc(){
 
                 }//fim-se for tipo2
                 else{
-                    erroSintatico("Tipo invalido!");
+                    erroSintatico("Tipo invalido !");
                 }
             }//fim-while
 
@@ -466,7 +466,7 @@ void tipos_p_opc(){
         }//fim-tipo
         else{
             //erro sintÃ¡tico TIPO INVALIDO
-            erroSintatico("Tipo invalido");
+            erroSintatico("Tipo invalido ou Esperado Parametros");
         }
 
     }//FIM-ELSE PR
